@@ -1,3 +1,3 @@
 # meet-personal-project
 
-stock exchange platform
+A stock exchange platform
