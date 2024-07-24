@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Display</title>
+        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
+    </head>
+    <body class="body">
+        <h1>{{stock}}</h1>
+        <p id="currentPrice">Current Price: {{ currentPrice }}</p>
+        <form action="/stock/{{stock}}/buy" method="post">
+            <input type="submit" value="buy">
+        </form>
+
+        <form action="/stock/{{stock}}/sell" method="post">
+            <input type="submit" value="sell">
+        </form>
+
+        <script>
+          // Set the stock variable as a JavaScript variable
+          var stock = '{{ stock }}';
+
+          // Initialize Firebase
+          var firebaseConfig = {
+            apiKey: "AIzaSyCcR5GJdFK0ReMLbbP_R9NUwhs_bGY8i4A",
+            authDomain: "database-project-ed4f6.firebaseapp.com",
+            projectId: "database-project-ed4f6",
+            storageBucket: "database-project-ed4f6.appspot.com",
+            messagingSenderId: "1033675079496",
+            appId: "1:1033675079496:web:413ceac2a5e5b5951d3d7d",
+            databaseURL:"https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
+          };
+          firebase.initializeApp(firebaseConfig);
+          var db = firebase.database();
+          var stockRef = db.ref('stockInfo/' + stock + '/prices/1');
+
+          // Listen for changes to the stock price
+          stockRef.on('value', function(data) {
+            var currentPrice = data.val();
+            document.getElementById('currentPrice').innerHTML = 'Current Price: ' + currentPrice;
+          });
+        </script>
+    </body>
+</html>

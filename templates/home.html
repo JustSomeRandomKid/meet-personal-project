@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Home</title>
+        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
+    </head>
+    <body class="body">
+        <div class="topPart">
+            <h2>The MBSE</h2>
+            <form action="/signOut" method="get">
+                <input type="submit" value="signout">
+            </form>
+        </div>
+        <div class="middlePart">
+            <h1 id="balanceAndUsername"></h1>
+            <button onclick="goTrade()">Trade</button>
+        </div>
+        <div class="bottomPart">
+            <p>stocks:</p>
+            <ul id="stockList">
+            </ul>
+        </div>
+    </body>
+</html>
+<script>
+    function goTrade(){
+        window.location='/trade'
+    }
+    // Set the stock variable as a JavaScript variable
+    var uid = '{{ uid }}'; 
+    var username ='{{username}}'
+
+    // Initialize Firebase
+    var firebaseConfig = {
+    apiKey: "AIzaSyCcR5GJdFK0ReMLbbP_R9NUwhs_bGY8i4A",
+    authDomain: "database-project-ed4f6.firebaseapp.com",
+    projectId: "database-project-ed4f6",
+    storageBucket: "database-project-ed4f6.appspot.com",
+    messagingSenderId: "1033675079496",
+    appId: "1:1033675079496:web:413ceac2a5e5b5951d3d7d",
+    databaseURL:"https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    var balanceRef = db.ref('users/' + uid + '/balance'+'/balance');
+    var stockRef = db.ref('stockInfo');
+
+    // Listen for changes to the stock price
+    balanceRef.on('value', function(data) {
+        try{
+            var currentBalance = data.val();
+        }
+        catch{
+            var currentBalance = "";
+        }
+        document.getElementById('balanceAndUsername').innerHTML = "Hello, " + username + "<br> Account balance: " + currentBalance + "$";
+    })
+
+    // Listen for changes to the stock list
+    stockRef.on('value', function(data) {
+        var stockList = data.val();
+        var ul = document.getElementById('stockList');
+        ul.innerHTML = '';
+        for (var stock in stockList) {
+            var li = document.createElement('li');
+            li.textContent = stock;
+            ul.appendChild(li);
+        }
+    })
+</script>
