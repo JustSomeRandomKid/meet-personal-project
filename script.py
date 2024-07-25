@@ -70,7 +70,10 @@ def run():
 thread = threading.Thread(target=run)
 thread.start()
 
-    
+@app.route('/try')
+def trying():
+    return render_template('try.html')
+
 @app.route('/signIn',methods=['GET','POST'])
 def signIn():
     if request.method == 'GET':
@@ -90,6 +93,7 @@ def signIn():
 @app.route('/',methods=['GET','POST'])
 @app.route('/home',methods=['GET','POST'])
 def home():
+    global current_user_value
     try:
         username=db.child('users').child(login_session['user']['localId']).child('username').get().val()
         stocksOwned = db.child('users').child(login_session['user']['localId']).child('stocksOwned').get().val()
