@@ -1,72 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Home</title>
-        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
-    </head>
-    <body class="body">
-        <div class="topPart">
-            <h2>The MBSE</h2>
-            <form action="/signOut" method="get">
-                <input type="submit" value="signout">
-            </form>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
+    <style>
+        /* General Reset */
+        body, h1, h2, h3, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full-screen container */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+            color: #797878;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #balanceAndUsername{
+            margin-top: 50px;
+        }
+        #signOutBtn{
+            margin-right: 30px;
+            margin-left: 10px;
+        }
+        
+
+        /* Header styling */
+        .header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 20px;
+            background: rgba(35, 35, 35, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header:hover {
+            background: rgba(41, 41, 41, 0.7);
+        }
+
+        .header h1 {
+            font-size: 28px; /* Reduced font size */
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .header button {
+            border: none;
+            color: #fff;
+            padding: 8px 16px; /* Adjusted padding */
+            font-size: 14px; /* Adjusted font size */
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .header #signInBtn {
+            background: #2f302f; /* Sign In button color */
+        }
+
+        .header #signInBtn:hover {
+            background: #3c3e3c;
+        }
+
+        .header #signOutBtn {
+            background: #2f302f; /* Sign Out button color */
+        }
+
+        .header #signOutBtn:hover {
+            background: #3c3e3c;
+        }
+
+        /* Main content area */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 70px; /* Adjusted top margin */
+            z-index: 1;
+        }
+
+        .welcome-section {
+            margin-bottom: 40px;
+        }
+
+        .welcome-section h2 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .welcome-section p {
+            font-size: 20px;
+            color: #7b7878;
+            max-width: 800px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .button-group button {
+            background: #2f2f2f;
+            border: none;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-group button:hover {
+            background-color: #464747;
+            transform: scale(1.05);
+        }
+
+        /* Stock list */
+        .stock-list {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 50px;
+            padding: 20px;
+            background: rgba(30, 29, 29, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            color: #605c5c;
+        }
+
+        .stock-list h3 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .stock-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .stock-list li {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .stock-list li:hover {
+            background-color: rgb(46, 46, 46);
+            color: #5f5e5e;
+        }
+
+        .stock-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>The MBSE</h1>
+        <div>
+            <button id="signInBtn">Sign In</button>
+            <button id="signOutBtn">Sign Out</button>
         </div>
-        <div class="middlePart">
-            <h1 id="balanceAndUsername"></h1>
-            <button onclick="goTrade()">Trade</button>
+    </header>
+    <div class="main-content">
+        <div class="welcome-section">
+            <h2 id="balanceAndUsername"></h2>
+            <p>Welcome to your stock management platform. Track your investments and make trades with ease.</p>
         </div>
-        <div class="bottomPart">
-            <p>stocks:</p>
-            <ul id="stockList">
-            </ul>
+        <div class="button-group">
+            <button id="tradeBtn">Trade</button>
         </div>
-    </body>
+        <div class="stock-list">
+            <h3>Stocks:</h3>
+            <ul id="stockList"></ul>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signOutBtn').addEventListener('click', function() {
+            window.location = '/signOut';
+        });
+
+        document.getElementById('signInBtn').addEventListener('click', function() {
+            window.location = '/signIn';
+        });
+
+        document.getElementById('tradeBtn').addEventListener('click', function() {
+            window.location = '/trade';
+        });
+
+        // Set the stock variable as a JavaScript variable
+        var uid = '{{ uid }}'; 
+        var username = '{{username}}';
+
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyCcR5GJdFK0ReMLbbP_R9NUwhs_bGY8i4A",
+            authDomain: "database-project-ed4f6.firebaseapp.com",
+            projectId: "database-project-ed4f6",
+            storageBucket: "database-project-ed4f6.appspot.com",
+            messagingSenderId: "1033675079496",
+            appId: "1:1033675079496:web:413ceac2a5e5b5951d3d7d",
+            databaseURL: "https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+        var balanceRef = db.ref('users/' + uid + '/balance/balance');
+        var stockRef = db.ref('/users/' + uid + '/stocksOwned');
+        document.getElementById('balanceAndUsername').innerHTML = "Hello, " + '{{username}}' + "<br>Account balance: $" + '{{balance}}';
+        // Listen for changes to the stock price
+        balanceRef.on('value', function(data) {
+            try {
+                var currentBalance = data.val();
+                currentBalance = currentBalance.toFixed(3); // Format balance to 3 decimal places
+            } catch {
+                var currentBalance = "0.000";
+            }
+            document.getElementById('balanceAndUsername').innerHTML = "Hello, " + username + "<br>Account balance: $" + currentBalance;
+        });
+
+        // Listen for changes to the stock list
+        stockRef.on('value', function(data) {
+            var stockList = data.val();
+            var ul = document.getElementById('stockList');
+            ul.innerHTML = '';
+            for (var stock in stockList) {
+                if (stockList[stock] > 0) {
+                    var li = document.createElement('li');
+                    li.textContent = stock + ": " + stockList[stock];
+                    ul.appendChild(li);
+                }
+            }
+        });
+    </script>
+</body>
 </html>
-<script>
-    function goTrade(){
-        window.location='/trade'
-    }
-    // Set the stock variable as a JavaScript variable
-    var uid = '{{ uid }}'; 
-    var username ='{{username}}'
-
-    // Initialize Firebase
-    var firebaseConfig = {
-    apiKey: "AIzaSyCcR5GJdFK0ReMLbbP_R9NUwhs_bGY8i4A",
-    authDomain: "database-project-ed4f6.firebaseapp.com",
-    projectId: "database-project-ed4f6",
-    storageBucket: "database-project-ed4f6.appspot.com",
-    messagingSenderId: "1033675079496",
-    appId: "1:1033675079496:web:413ceac2a5e5b5951d3d7d",
-    databaseURL:"https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
-    };
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
-    var balanceRef = db.ref('users/' + uid + '/balance'+'/balance');
-    var stockRef = db.ref('stockInfo');
-
-    // Listen for changes to the stock price
-    balanceRef.on('value', function(data) {
-        try{
-            var currentBalance = data.val();
-        }
-        catch{
-            var currentBalance = "";
-        }
-        document.getElementById('balanceAndUsername').innerHTML = "Hello, " + username + "<br> Account balance: " + currentBalance + "$";
-    })
-
-    // Listen for changes to the stock list
-    stockRef.on('value', function(data) {
-        var stockList = data.val();
-        var ul = document.getElementById('stockList');
-        ul.innerHTML = '';
-        for (var stock in stockList) {
-            var li = document.createElement('li');
-            li.textContent = stock;
-            ul.appendChild(li);
-        }
-    })
-</script>

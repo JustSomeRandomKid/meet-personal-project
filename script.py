@@ -30,11 +30,14 @@ def updateBalance():
     db = firebase.database()
     global current_user_value
     if current_user_value!= None:
-        stocks = db.child('stockInfo').get().val().keys()
         finalBalance = 0
         uid = current_user_value['localId']
-        print(uid)
-        liquidity = db.child('users').child(uid).child('liquidity').get().val()
+        try:
+            stocks = db.child('users').child(uid).child('stocksOwned').get().val().keys()
+        except Exception as e:
+            stocks={}
+            print(e)
+        liquidity = db.child('users').child(uid).child('liquidity').child('liquidity').get().val()
         for stock in stocks:
             stockPrice = db.child('stockInfo').child(stock).child('prices').child('1').get().val()
             amountOfStock = db.child('users').child(uid).child('stocksOwned').child(stock).get().val()
@@ -45,8 +48,8 @@ def updateBalance():
 
 def updateStockPrice(stock,lastTodayBuys):
     db=firebase.database()
-    todayBuys=int(db.child('stockInfo').child(stock).child('buysToday').get().val())
-    totalPublicStocks=db.child('stockInfo').child(stock).child('totalStocks').get().val()
+    todayBuys=int(db.child('stockInfo').child(stock).child('buysToday').child('buysToday').get().val())
+    totalPublicStocks=db.child('stockInfo').child(stock).child('totalStocks').child('totalStocks').get().val()
     currentPrice=db.child('stockInfo').child(stock).child('prices').child('1').get().val()
     stablizer=0.1*random.randint(1,15)*random.choice([-1,1])
     updatedPrice=currentPrice+((todayBuys-lastTodayBuys))+stablizer
@@ -54,16 +57,14 @@ def updateStockPrice(stock,lastTodayBuys):
 def run():
     with app.app_context():
         global current_user_value
-        print(current_user_value) 
         with app.app_context():
             db = firebase.database()
             stocks = db.child('stockInfo').get().val().keys()
             while True:
                 updateBalance()
-                print(current_user_event)
                 for stock in stocks:
-                    lastTodayBuys = int(db.child('stockInfo').child(stock).child('buysToday').get().val())
-                    time.sleep(1)
+                    lastTodayBuys = int(db.child('stockInfo').child(stock).child('buysToday').child('buysToday').get().val())
+                    time.sleep(0.5)
                     db = firebase.database()
                     db.child('stockInfo').child(stock).child('prices').update({'1': updateStockPrice(stock, lastTodayBuys)})
 
@@ -95,10 +96,10 @@ def signIn():
 def home():
     global current_user_value
     try:
-        username=db.child('users').child(login_session['user']['localId']).child('username').get().val()
         stocksOwned = db.child('users').child(login_session['user']['localId']).child('stocksOwned').get().val()
-        accountBalance=db.child('users').child(login_session['user']['localId']).child('balance').get().val()
+        accountBalance=db.child('users').child(login_session['user']['localId']).child('balance').child('balance').get().val()
         uid=login_session['user']['localId']
+        username=db.child('users').child(login_session['user']['localId']).child('username').get().val()
     except:
         username="Guest"
         stocksOwned={'no stocks data':'user is not signed in'}
@@ -116,7 +117,10 @@ def signUp():
     balance = 10000
     try:
         user_record = auth.create_user_with_email_and_password(email,password)
-        db.child('users').child(login_session['user']['localId']).set({'username':username,'balance':balance,'liquidity':balance,'stocksOwned':{}})
+        login_session['user'] = user_record
+        current_user_value = user_record
+        current_user_event.set() 
+        db.child('users').child(login_session['user']['localId']).set({'username':username,'balance':{"balance":balance},'liquidity':{"liquidity":balance},'stocksOwned':{}})
         login_session['user'] = user_record
         auth.current_user = user_record
     except Exception as e:
@@ -138,7 +142,7 @@ def trade():
     if login_session['user'] is not None:
         if request.method=='GET':
             balance=db.child('users').child(login_session['user']['localId']).child('balance').get().val()
-            liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').get().val()
+            liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').child('liquidity').get().val()
             try:
                 uid=login_session['user']['localId']
             except:
@@ -150,50 +154,63 @@ def trade():
 @app.route('/stock/<stock>')
 def tradeStockPage(stock):
     currentPrice = db.child('stockInfo').child(stock).child('prices').child('1').get().val()
-    #display and create graph...
-    return render_template('stock.html',stock=stock,currentPrice=currentPrice)
+    priceHistory = db.child('stockInfo').child(stock).child('prices').get().val()
+    return render_template('stock.html',stock=stock,currentPrice=currentPrice,price_history=priceHistory)
 
-@app.route('/stock/<stock>/buy',methods=['GET','POST'])
+@app.route('/stock/<stock>/buy', methods=['POST'])
 def buyAStock(stock):
+    quantity = int(request.form['quantity'])
     stockPrice = db.child('stockInfo').child(stock).child('prices').child('1').get().val()
-    liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').get().val()
-    try:
-        stocksOwned = db.child('users').child(login_session['user']['localId']).child('stocksOwned').get().val()
-    except:
-        stocksOwned=""
-    try:
-        stockInProfolio = int(db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).get().val())
-    except:
-        stockInProfolio=""
-    if liquidity > stockPrice:
-        db.child('users').child(login_session['user']['localId']).child('liquidity').set(liquidity-stockPrice) # pay for the stock
-        todayBuys=int(db.child('stockInfo').child(stock).child('buysToday').get().val())
-        db.child('stockInfo').child(stock).child('buysToday').set(todayBuys+1) # update amount of buyers today
-        if stock in stocksOwned:
-            db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).set(stockInProfolio+1) # add stock to profolio
-        else:
-            db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).set(1) # add stock to profolio
-        return render_template('success.html',action="bought",stock=stock)
-    return redirect(url_for('tradeStockPage',stock=stock))
+    liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').child('liquidity').get().val()
+    totalPublicStocks = db.child('stockInfo').child(stock).child('totalStocks').child('totalStocks').get().val()
+
+    if liquidity >= stockPrice * quantity and totalPublicStocks >= quantity:
+        new_liquidity = liquidity - stockPrice * quantity
+        db.child('users').child(login_session['user']['localId']).child('liquidity').update({'liquidity': new_liquidity})
+
+        try:
+            stockInPortfolio = int(db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).get().val())
+        except:
+            stockInPortfolio = 0
+
+        db.child('users').child(login_session['user']['localId']).child('stocksOwned').update({stock: stockInPortfolio + quantity})
+        db.child('stockInfo').child(stock).child('totalStocks').update({'totalStocks': totalPublicStocks - quantity})
+
+        # Increment buysToday by the quantity of stocks bought
+        todayBuys = int(db.child('stockInfo').child(stock).child('buysToday').child('buysToday').get().val())
+        new_buys_today = todayBuys + quantity
+        db.child('stockInfo').child(stock).child('buysToday').update({'buysToday': new_buys_today})
+
+        return "Success"
+    return "Failed"
 
 
-@app.route('/stock/<stock>/sell',methods=['GET','POST'])
+@app.route('/stock/<stock>/sell', methods=['POST'])
 def sellAStock(stock):
+    quantity = int(request.form['quantity'])
     stockPrice = db.child('stockInfo').child(stock).child('prices').child('1').get().val()
-    liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').get().val()
-    stocksOwned = db.child('users').child(login_session['user']['localId']).child('stocksOwned').get().val()
+    liquidity = db.child('users').child(login_session['user']['localId']).child('liquidity').child('liquidity').get().val()
+    
     try:
-        stockInProfolio = int(db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).get().val())
+        stockInPortfolio = int(db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).get().val())
     except:
-        stockInProfolio=""
-    if stock in stocksOwned and stockInProfolio>=1:
-        db.child('users').child(login_session['user']['localId']).child('liquidity').set(liquidity+stockPrice) # get money for the stock
-        todayBuys=int(db.child('stockInfo').child(stock).child('buysToday').get().val())
-        db.child('stockInfo').child(stock).child('buysToday').set(todayBuys-1) # update amount of buyers today
-        db.child('users').child(login_session['user']['localId']).child('stocksOwned').child(stock).set(stockInProfolio-1) # remove stock from profolio
-        return render_template('success.html',action="sold",stock=stock)
-    return redirect(url_for('tradeStockPage',stock=stock))
-
+        stockInPortfolio = 0
+    
+    if stockInPortfolio >= quantity:
+        new_liquidity = liquidity + stockPrice * quantity
+        db.child('users').child(login_session['user']['localId']).child('liquidity').update({'liquidity': new_liquidity})
+        db.child('users').child(login_session['user']['localId']).child('stocksOwned').update({stock: stockInPortfolio - quantity})
+        
+        totalPublicStocks = db.child('stockInfo').child(stock).child('totalStocks').child('totalStocks').get().val()
+        db.child('stockInfo').child(stock).child('totalStocks').update({'totalStocks': totalPublicStocks + quantity})
+        
+        # Decrement buysToday by the quantity of stocks sold
+        todayBuys = int(db.child('stockInfo').child(stock).child('buysToday').child('buysToday').get().val())
+        new_buys_today = max(todayBuys - quantity, 0)
+        db.child('stockInfo').child(stock).child('buysToday').update({'buysToday': new_buys_today})
+        
+        return "Success"
+    return "Failed"
 
 if __name__ == '__main__':
     app.run(debug=True)

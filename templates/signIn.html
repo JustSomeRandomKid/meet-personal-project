@@ -1,14 +1,154 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>sign in</title>
-    </head>
-    <body class="body">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <style>
+        /* General Reset */
+        body, h1, p, form, input, button {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full-screen container */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+            color: #797878;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Header styling */
+        .header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 20px;
+            background: rgba(35, 35, 35, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .header button {
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .header #signInBtn {
+            background: #2f302f;
+        }
+
+        .header #signInBtn:hover {
+            background: #3c3e3c;
+        }
+
+        .header #signOutBtn {
+            background: #2f302f;
+        }
+
+        .header #signOutBtn:hover {
+            background: #3c3e3c;
+        }
+
+        /* Main content area */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 70px;
+            padding: 20px;
+            background: rgba(30, 29, 29, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            color: #605c5c;
+            width: 100%;
+            max-width: 500px;
+            height: 50%;
+        }
+
+        .container h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .container p {
+            font-size: 20px;
+            color: #7b7878;
+            margin-bottom: 20px;
+        }
+
+        .container form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .container form input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: none;
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .container form button {
+            background: #2f2f2f;
+            border: none;
+            color: #fff;
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .container form button:hover {
+            background-color: #464747;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>The MBSE</h1>
+    </header>
+    <div class="container">
+        <h1>Sign In</h1>
         <form action="/signIn" method="post">
-            <input name="email" type="email" placeholder="Enter email">
-            <input name="password" type="password" placeholder="Enter password">
-            <input name="button" type="submit">
+            <input name="email" type="email" placeholder="Enter email" required>
+            <input name="password" type="password" placeholder="Enter password" required>
+            <button type="submit">Sign In</button>
         </form>
-    </body>
+    </div>
+</body>
 </html>

@@ -1,45 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Display</title>
-        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
-    </head>
-    <body class="body">
-        <h1>{{stock}}</h1>
-        <p id="currentPrice">Current Price: {{ currentPrice }}</p>
-        <form action="/stock/{{stock}}/buy" method="post">
-            <input type="submit" value="buy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Stock</title>
+    <style>
+        /* General Reset */
+        body, h1, p, form, input, button {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full-screen container */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+            color: #797878;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Header styling */
+        .header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 10px 20px;
+            background: rgba(35, 35, 35, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .header button {
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .header #signInBtn {
+            background: #2f302f;
+        }
+
+        .header #signInBtn:hover {
+            background: #3c3e3c;
+        }
+
+        .header #signOutBtn {
+            background: #2f302f;
+        }
+
+        .header #signOutBtn:hover {
+            background: #3c3e3c;
+        }
+
+        /* Main content area */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 70px;
+            padding: 20px;
+            background: rgba(30, 29, 29, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            color: #3a3939;
+        }
+
+        .container h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .container p {
+            font-size: 20px;
+            color: #7b7878;
+            margin-bottom: 20px;
+        }
+
+        .container form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .container form input {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .container form button {
+            background: #2f2f2f;
+            border: none;
+            color: #fff;
+            padding: 10px 25px;
+            font-size: 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .container form button:hover {
+            background-color: #464747;
+            transform: scale(1.05);
+        }
+
+        .alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            font-size: 18px;
+        }
+
+        .alert.error {
+            background-color: #ff4c4c;
+            color: #fff;
+        }
+
+        .alert.success {
+            background-color: #4caf50;
+            color: #fff;
+        }
+        #quantity{
+          background-color: #2f2f2f;
+          height: 40px;
+          margin-top: 10px;
+          margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>The MBSE</h1>
+        <div>
+            <button id="signInBtn">Sign In</button>
+            <button id="signOutBtn">Sign Out</button>
+        </div>
+    </header>
+    <div class="container">
+        <h1>Trade Stock: {{ stock }}</h1>
+        <p id="currentPrice">Current Price: ${{ currentPrice }}</p>
+        <canvas id="priceChart" width="400" height="200"></canvas>
+        <form id="tradeForm">
+            <input type="number" id="quantity" name="quantity" min="1" required>
+            <button type="button" onclick="buyStock()">Buy</button>
+            <button type="button" onclick="sellStock()">Sell</button>
         </form>
+    </div>
+    <div class="alert" id="alert"></div>
 
-        <form action="/stock/{{stock}}/sell" method="post">
-            <input type="submit" value="sell">
-        </form>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@8.2.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const stock = "{{ stock }}";
+      const priceHistory = {{ price_history | tojson }};
+      
+      function showAlert(message, isError = false) {
+          const alertBox = document.getElementById('alert');
+          alertBox.textContent = message;
+          alertBox.classList.toggle('error', isError);
+          alertBox.classList.toggle('success', !isError);
+          alertBox.style.display = 'block';
+          setTimeout(() => {
+              alertBox.style.display = 'none';
+          }, 3000);
+      }
 
-        <script>
-          // Set the stock variable as a JavaScript variable
-          var stock = '{{ stock }}';
+      async function buyStock() {
+          const quantity = document.getElementById('quantity').value;
+          const response = await fetch(`/stock/${stock}/buy`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `quantity=${quantity}`
+          });
+          const result = await response.text();
+          if (result === "Success") {
+              showAlert(`Successfully bought ${quantity} stocks of ${stock}`);
+          } else {
+              showAlert(`Failed to buy stocks`, true);
+          }
+      }
 
-          // Initialize Firebase
-          var firebaseConfig = {
+      async function sellStock() {
+          const quantity = document.getElementById('quantity').value;
+          const response = await fetch(`/stock/${stock}/sell`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `quantity=${quantity}`
+          });
+          const result = await response.text();
+          if (result === "Success") {
+              showAlert(`Successfully sold ${quantity} stocks of ${stock}`);
+          } else {
+              showAlert(`Failed to sell stocks`, true);
+          }
+      }
+
+      document.addEventListener('DOMContentLoaded', (event) => {
+          const ctx = document.getElementById('priceChart').getContext('2d');
+          const days = Object.keys(priceHistory);
+          const prices = Object.values(priceHistory);
+
+          new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: days.map(day => `Day ${day}`),
+                  datasets: [{
+                      label: 'Price History',
+                      data: prices,
+                      borderColor: 'rgba(75, 192, 192, 1)',
+                      borderWidth: 1,
+                      fill: false
+                  }]
+              },
+              options: {
+                  scales: {
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'Days'
+                          }
+                      },
+                      y: {
+                          title: {
+                              display: true,
+                              text: 'Price'
+                          }
+                      }
+                  }
+              }
+          });
+      });
+
+      var firebaseConfig = {
             apiKey: "AIzaSyCcR5GJdFK0ReMLbbP_R9NUwhs_bGY8i4A",
             authDomain: "database-project-ed4f6.firebaseapp.com",
             projectId: "database-project-ed4f6",
             storageBucket: "database-project-ed4f6.appspot.com",
             messagingSenderId: "1033675079496",
             appId: "1:1033675079496:web:413ceac2a5e5b5951d3d7d",
-            databaseURL:"https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
-          };
-          firebase.initializeApp(firebaseConfig);
-          var db = firebase.database();
-          var stockRef = db.ref('stockInfo/' + stock + '/prices/1');
+            databaseURL: "https://database-project-ed4f6-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
 
-          // Listen for changes to the stock price
-          stockRef.on('value', function(data) {
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.database();
+        var stockRef = db.ref('stockInfo/' + stock + '/prices/1');
+
+        // Listen for changes to the stock price
+        stockRef.on('value', function(data) {
             var currentPrice = data.val();
-            document.getElementById('currentPrice').innerHTML = 'Current Price: ' + currentPrice;
-          });
-        </script>
-    </body>
+            if (currentPrice !== null) {
+                currentPrice = parseFloat(currentPrice).toFixed(3);
+                document.getElementById('currentPrice').innerHTML = 'Current Price: ' + currentPrice + '$';
+            } else {
+            document.getElementById('currentPrice').innerHTML = 'Current Price: N/A';
+            }
+        });
+    </script>
+</body>
 </html>

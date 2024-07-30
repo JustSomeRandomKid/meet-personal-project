@@ -1,87 +1,307 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CAPTURE</title>
-  <style>
-    body {
-      background-color: #00b0ff; /* Example background color */
-      margin: 0;
-      font-family: sans-serif;
-      overflow: hidden;
-    }
-    .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      color: white;
-    }
-    .nav {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .nav li {
-      margin-right: 20px;
-    }
-    .nav a {
-      color: white;
-      text-decoration: none;
-    }
-    .hero {
-      text-align: center;
-      padding: 30px 0;
-    }
-    .hero h1 {
-      font-size: 48px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 20px;
-    }
-    .hero p {
-      color: white;
-      font-size: 18px;
-    }
-    .phone {
-      width: 300px; /* Increased width */
-      height: 500px; /* Increased height */
-      background-color: #333;
-      border-radius: 10px;
-      margin: 0 auto; /* Centered horizontally */
-      position: relative;
-      margin-top: 20px;
-    }
-    /* Remove the weird thing inside */
-    .phone::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100%; /* Full width */
-      height: 100%; /* Full height */
-      background-color: #666;
-      border-radius: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Stock Exchange Platform</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <div class="logo">CAPTURE</div>
-    <ul class="nav">
-      <li><a href="#">HOME</a></li>
-      <li><a href="#">TRADE</a></li>
-    </ul>
-  </div>
-  <div class="hero">
-    <h1>DISCOVER. EXPLORE. CREATE.</h1>
-    <p>Download our application to your iPhone today.</p>
-    <div class="phone"></div>
-  </div>
+    <header>
+        <h1>Modern Stock Exchange</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Market Overview</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">News</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Invest Smarter. Trade Confidently.</h2>
+                <p>Your gateway to the global financial markets. Access real-time data, track your investments, and make informed decisions.</p>
+                <a href="#" class="button">Get Started</a>
+            </div>
+            <div class="hero-image">
+                <img src="https://unsplash.com/s/photos/financial-markets" alt="Financial Market Image">
+            </div>
+        </section>
+        <section class="market-overview">
+            <h2>Market Overview</h2>
+            <div class="overview-grid">
+                <div class="overview-item">
+                    <h3>NASDAQ</h3>
+                    <p class="index-value">15,000.00</p>
+                    <p class="change">(+1.50%)</p>
+                </div>
+                <div class="overview-item">
+                    <h3>S&P 500</h3>
+                    <p class="index-value">4,500.00</p>
+                    <p class="change">(+0.75%)</p>
+                </div>
+                <div class="overview-item">
+                    <h3>Dow Jones</h3>
+                    <p class="index-value">35,000.00</p>
+                    <p class="change">(+0.50%)</p>
+                </div>
+            </div>
+        </section>
+        <section class="portfolio">
+            <h2>Your Portfolio</h2>
+            <div class="portfolio-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>Quantity</th>
+                            <th>Total Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AAPL</td>
+                            <td>Apple Inc.</td>
+                            <td>$175.00</td>
+                            <td>(+0.50%)</td>
+                            <td>100</td>
+                            <td>$17,500.00</td>
+                        </tr>
+                        <tr>
+                            <td>MSFT</td>
+                            <td>Microsoft Corp.</td>
+                            <td>$320.00</td>
+                            <td>(+1.00%)</td>
+                            <td>50</td>
+                            <td>$16,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>GOOG</td>
+                            <td>Alphabet Inc.</td>
+                            <td>$2,800.00</td>
+                            <td>(-0.25%)</td>
+                            <td>10</td>
+                            <td>$28,000.00</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="news">
+            <h2>Market News</h2>
+            <div class="news-grid">
+                <div class="news-item">
+                    <h3>Headline 1</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                    <a href="#" class="button">Read More</a>
+                </div>
+                <div class="news-item">
+                    <h3>Headline 2</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                    <a href="#" class="button">Read More</a>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Modern Stock Exchange</p>
+    </footer>
 </body>
 </html>
+<style>body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px 0;
+}
+
+header h1 {
+  text-align: center;
+  margin: 0;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+nav li {
+  display: inline-block;
+  margin: 0 15px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #fff;
+}
+
+main {
+  padding: 20px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.hero-content {
+  flex: 1;
+  margin-right: 40px;
+}
+
+.hero-image {
+  flex: 1;
+}
+
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.market-overview {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.overview-item {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.overview-item h3 {
+  margin-top: 0;
+}
+
+.index-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.change {
+  font-size: 16px;
+  color: #007bff;
+}
+
+.portfolio {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.portfolio-table {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.news {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.news-item {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.news-item h3 {
+  margin-top: 0;
+}
+
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero {
+      flex-direction: column;
+  }
+
+  .hero-content {
+      margin-bottom: 20px;
+  }
+
+  .overview-grid {
+      grid-template-columns: 1fr;
+  }
+
+  .news-grid {
+      grid-template-columns: 1fr;
+  }
+}</style>
