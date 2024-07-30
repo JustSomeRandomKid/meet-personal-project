@@ -32,7 +32,11 @@
             margin-right: 30px;
             margin-left: 10px;
         }
-        
+        #signUpBtn{
+            margin-right: 10px;
+            margin-left: 10px;
+            background-color: #2f2f2f;
+        }
 
         /* Header styling */
         .header {
@@ -180,8 +184,10 @@
     <header class="header">
         <h1>The MBSE</h1>
         <div>
+            <button id="signUpBtn">Sign Up</button>
             <button id="signInBtn">Sign In</button>
             <button id="signOutBtn">Sign Out</button>
+
         </div>
     </header>
     <div class="main-content">
@@ -205,6 +211,11 @@
 
         document.getElementById('signInBtn').addEventListener('click', function() {
             window.location = '/signIn';
+        });
+
+        
+        document.getElementById('signUpBtn').addEventListener('click', function() {
+            window.location = '/signUp';
         });
 
         document.getElementById('tradeBtn').addEventListener('click', function() {

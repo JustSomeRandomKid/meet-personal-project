@@ -109,6 +109,7 @@ def home():
 
 @app.route('/signUp',methods=['GET','POST'])
 def signUp():
+    db =firebase.database()
     if request.method == 'GET':
         return render_template('signUp.html')
     email = request.form['email']
@@ -116,6 +117,7 @@ def signUp():
     username= request.form['username']
     balance = 10000
     try:
+        global current_user_value
         user_record = auth.create_user_with_email_and_password(email,password)
         login_session['user'] = user_record
         current_user_value = user_record
